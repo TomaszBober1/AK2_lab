@@ -18,18 +18,23 @@ msg: .ascii "Write text you want to encrypt:\n"
 msg_len= . -msg
 
 _start:
+;writing instruction, on the screen, for the user
 mov $SYSWRITE, %eax
 mov $STDOUT, %ebx
 mov $msg, %ecx
 mov $msg_len, %edx
 int $SYSCALL32
 
+;loading text from the user
 mov $SYSREAD, %eax
 mov $STDIN, %ebx
 mov $input, %ecx
 mov $BUFFOR_LENGTH, %edx
 int $SYSCALL32
 
+encrypt:
+
+;writing, previously loaded, text on the screen
 mov $SYSWRITE, %eax
 mov $STDOUT, %ebx
 mov $input, %ecx
