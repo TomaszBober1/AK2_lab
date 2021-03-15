@@ -30,6 +30,12 @@ mov $input, %ecx
 mov $BUFFOR_LENGTH, %edx
 int $SYSCALL32
 
+mov $SYSWRITE, %eax
+mov $STDOUT, %ebx
+mov $input, %ecx
+mov $BUFFOR_LENGTH, %edx
+int $SYSCALL32
+
 mov $SYSEXIT32, %eax
 mov $0, %ebx
 int $SYSCALL32
