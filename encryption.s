@@ -41,14 +41,16 @@ mov $0, %esi
 
 #loop in which we encrypt the text
 encrypt:
-cmpb $0x41, input(%esi)
+cmpb $0x7A, input(%esi) #preventing encryption of polish characters
+ja backsmall
+cmpb $0x41, input(%esi) #comparing text loaded from user with ascii codes
 jae big
 backbig:
 cmpb $0x61, input(%esi)
 jae small
 backsmall:
 inc %esi
-cmp %edi, %esi
+cmp %edi, %esi  #checking if the loop should have ended
 jl encrypt
 
 #writing, encrypted text on the screen
@@ -58,6 +60,7 @@ mov $STDOUT, %ebx
 mov $input, %ecx
 int $SYSCALL32
 
+#exit from program
 mov $SYSEXIT32, %eax
 mov $0, %ebx
 int $SYSCALL32
