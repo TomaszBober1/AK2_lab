@@ -18,29 +18,79 @@ msg: .ascii "Write text you want to encrypt:\n"
 msg_len= . -msg
 
 _start:
-;writing instruction, on the screen, for the user
+#writing instruction, on the screen, for the user
 mov $SYSWRITE, %eax
 mov $STDOUT, %ebx
 mov $msg, %ecx
 mov $msg_len, %edx
 int $SYSCALL32
 
-;loading text from the user
+#loading text from the user
 mov $SYSREAD, %eax
 mov $STDIN, %ebx
 mov $input, %ecx
 mov $BUFFOR_LENGTH, %edx
 int $SYSCALL32
 
-encrypt:
+#copy length of loaded text
+mov %eax, %edi
+dec %edi
 
-;writing, previously loaded, text on the screen
+#create loop counter
+mov $0, %esi
+
+#loop in which we encrypt the text
+encrypt:
+cmpb $0x41, input(%esi)
+jae big
+backbig:
+cmpb $0x61, input(%esi)
+jae small
+backsmall:
+inc %esi
+cmp %edi, %esi
+jl encrypt
+
+#writing, encrypted text on the screen
+mov %eax, %edx
 mov $SYSWRITE, %eax
 mov $STDOUT, %ebx
 mov $input, %ecx
-mov $BUFFOR_LENGTH, %edx
 int $SYSCALL32
 
 mov $SYSEXIT32, %eax
 mov $0, %ebx
 int $SYSCALL32
+
+#uppercase and lowercase encryption instructions
+big:
+cmpb $0x4F, input(%esi)
+jl bigf
+jae bigs
+jmp backbig
+
+bigf:
+addb $0x0D, input(%esi)
+jmp backbig
+
+bigs:
+cmpb $0x5A, input(%esi)
+ja backbig
+subb $0x0D, input(%esi)
+jmp backbig
+
+small:
+cmpb $0x6F, input(%esi)
+jl smallf
+jae smalls
+jmp backsmall
+
+smallf:
+addb $0x0D, input(%esi)
+jmp backsmall
+
+smalls:
+cmpb $0x7A, input(%esi)
+ja backsmall
+subb $0x0D, input(%esi)
+jmp backsmall
