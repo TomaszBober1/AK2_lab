@@ -17,6 +17,10 @@ msg: .ascii "Write text you want to encrypt:\n"
 
 msg_len= . -msg
 
+msgsecond: .ascii "ROT13:\n"
+
+msgsecond_len= . -msgsecond
+
 _start:
 #writing instruction, on the screen, for the user
 mov $SYSWRITE, %eax
@@ -53,8 +57,17 @@ inc %esi  #incrementation of loop condition
 cmp %edi, %esi  #checking if the loop should have ended
 jl encrypt
 
+mov %eax, %esi
+
+#informing user that encrypted text is printed on screen
+mov $SYSWRITE, %eax
+mov $STDOUT, %ebx
+mov $msgsecond, %ecx
+mov $msgsecond_len, %edx
+int $SYSCALL32
+
 #writing, encrypted text on the screen
-mov %eax, %edx
+mov %esi, %edx
 mov $SYSWRITE, %eax
 mov $STDOUT, %ebx
 mov $input, %ecx
@@ -69,7 +82,7 @@ int $SYSCALL32
 
 #uppercase enryption and dividing letters for first, second half of alphabet or getting back to loop if letter is not big
 big:
-cmpb $0x4F, input(%esi)
+cmpb $0x4E, input(%esi)
 jl bigf
 jae bigs
 jmp backbig
@@ -88,7 +101,7 @@ jmp backbig
 
 #lowercase enryption and dividing letters for first, second half of alphabet or getting back to loop if letter is not small
 small:
-cmpb $0x6F, input(%esi)
+cmpb $0x6E, input(%esi)
 jl smallf
 jae smalls
 jmp backsmall
