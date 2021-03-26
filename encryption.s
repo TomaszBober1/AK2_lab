@@ -43,13 +43,13 @@ mov $0, %esi
 encrypt:
 cmpb $0x7A, input(%esi) #preventing encryption of polish characters
 ja backsmall
-cmpb $0x41, input(%esi) #comparing text loaded from user with ascii codes
+cmpb $0x41, input(%esi) #comparing text loaded from user with ascii codes for uppercase letters
 jae big
 backbig:
-cmpb $0x61, input(%esi)
+cmpb $0x61, input(%esi) #comparing loaded letter if it is greater or equal than ASCII code of a
 jae small
 backsmall:
-inc %esi
+inc %esi  #incrementation of loop condition
 cmp %edi, %esi  #checking if the loop should have ended
 jl encrypt
 
@@ -60,38 +60,45 @@ mov $STDOUT, %ebx
 mov $input, %ecx
 int $SYSCALL32
 
-#exit from program
+#exit from program with code 0
 mov $SYSEXIT32, %eax
 mov $0, %ebx
 int $SYSCALL32
 
 #uppercase and lowercase encryption instructions
+
+#uppercase enryption and dividing letters for first, second half of alphabet or getting back to loop if letter is not big
 big:
 cmpb $0x4F, input(%esi)
 jl bigf
 jae bigs
 jmp backbig
 
+#encryption first half of alphabet for uppercase letters
 bigf:
 addb $0x0D, input(%esi)
 jmp backbig
 
+#comparing second half of alphabet(for uppercase letters) and encryption
 bigs:
 cmpb $0x5A, input(%esi)
 ja backbig
 subb $0x0D, input(%esi)
 jmp backbig
 
+#lowercase enryption and dividing letters for first, second half of alphabet or getting back to loop if letter is not small
 small:
 cmpb $0x6F, input(%esi)
 jl smallf
 jae smalls
 jmp backsmall
 
+#encryption first half of alphabet for lowercase letters
 smallf:
 addb $0x0D, input(%esi)
 jmp backsmall
 
+#comparing second half of alphabet(for lowercase letters) and encryption
 smalls:
 cmpb $0x7A, input(%esi)
 ja backsmall
